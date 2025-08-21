@@ -34,11 +34,12 @@ const SETTINGS_KEY = "bibler.settings.v1";
 function seedBooks() {
   const now = Date.now();
   return [
-    { id: 1, title: "1984", author: "George Orwell", status: "finished", cover: "https://covers.openlibrary.org/b/id/10521279-M.jpg", addedAt: now - 3000 },
-    { id: 2, title: "The Pragmatic Programmer", author: "Andrew Hunt, David Thomas", status: "reading", cover: "https://covers.openlibrary.org/b/id/12629965-M.jpg", addedAt: now - 2000 },
-    { id: 3, title: "El nombre de la rosa", author: "Umberto Eco", status: "toread", cover: "https://covers.openlibrary.org/b/id/8373226-M.jpg", addedAt: now - 1000 },
+    { id: 1, title: "1984", author: "George Orwell", status: "finished", cover: "https://covers.openlibrary.org/b/id/10521279-M.jpg", addedAt: now - 3000, rating: 9 },
+    { id: 2, title: "The Pragmatic Programmer", author: "Andrew Hunt, David Thomas", status: "reading", cover: "https://covers.openlibrary.org/b/id/12629965-M.jpg", addedAt: now - 2000, rating: 8 },
+    { id: 3, title: "El nombre de la rosa", author: "Umberto Eco", status: "toread", cover: "https://covers.openlibrary.org/b/id/8373226-M.jpg", addedAt: now - 1000, rating: 0 },
   ];
 }
+
 
 
 export default function App() {
