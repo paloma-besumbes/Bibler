@@ -1,18 +1,16 @@
 import { useState } from "react";
-import StarRating from "./StarRating.jsx";
 
 const placeholderCover = "https://placehold.co/400x600?text=Sin+portada";
 const statusLabel = (s) => (s === "reading" ? "Leyendo" : s === "finished" ? "Terminado" : "Por leer");
 
 export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit }) {
-    // Defaults seguros
+    // Valores por defecto seguros
     const {
         id = 0,
         title = "Sin título",
         author = "Autor desconocido",
         status = "toread",
         cover = placeholderCover,
-        rating = 0,
     } = book;
 
     const [isEditing, setIsEditing] = useState(false);
@@ -35,11 +33,6 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         setIsEditing(false);
     };
 
-    const onRate = (val) => {
-        // Guardamos directamente al cambiar la estrella
-        onEdit?.(id, { rating: val }, title);
-    };
-
     return (
         <article className="card" data-id={id}>
             <figure className="gr-cover">
@@ -58,15 +51,6 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                     <>
                         <h3>{title}</h3>
                         <p className="author">{author}</p>
-
-                        {/* Rating 10★ (2x5) */}
-                        <StarRating
-                            name={`rating-${id}`}
-                            value={rating || 0}
-                            onChange={onRate}
-                            label={`Puntuación para ${title}`}
-                        />
-
                         <button
                             type="button"
                             className="status"
