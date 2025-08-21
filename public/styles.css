@@ -513,3 +513,161 @@ input::placeholder {
   color: var(--muted);
   min-width: 40px;
 }
+
+/* ========================= */
+/*     Reseñas (texto)       */
+/* ========================= */
+
+.review-section {
+  margin-top: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: .85rem;
+  margin-bottom: 6px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .75rem;
+  border: 1px solid var(--border);
+}
+
+.badge.public {
+  border-color: #5bba6f;
+  color: #a7e3b3;
+}
+
+.badge.private {
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+}
+
+.review-text {
+  white-space: pre-wrap;
+  margin: 8px 0;
+  color: var(--text);
+}
+
+.review-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-link {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+}
+
+.btn.tiny {
+  padding: 6px 10px;
+  font-size: .85rem;
+}
+
+/* Editor */
+.review-editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.review-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.review-editor textarea {
+  width: 100%;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.review-help {
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.review-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.char-count {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.char-count.error {
+  color: #fca5a5;
+}
+
+/* Switch Pública/Privada */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch .slider {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: #1a2331;
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background .2s ease;
+}
+
+.switch .slider::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+  background: var(--text);
+  border-radius: 50%;
+  transition: left .2s ease;
+}
+
+.switch input:checked+.slider {
+  background: #2b8a3e;
+  border-color: #2b8a3e;
+}
+
+.switch input:checked+.slider::after {
+  left: 18px;
+}
+
+.switch .switch-label {
+  color: var(--muted);
+  font-size: .9rem;
+}

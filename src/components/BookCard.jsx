@@ -1,11 +1,11 @@
 import { useState } from "react";
 import StarRating from "./StarRating.jsx";
+import ReviewEditor from "./ReviewEditor.jsx";
 
 const placeholderCover = "https://placehold.co/400x600?text=Sin+portada";
 const statusLabel = (s) => (s === "reading" ? "Leyendo" : s === "finished" ? "Terminado" : "Por leer");
 
 export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit }) {
-    // Defaults seguros
     const {
         id = 0,
         title = "Sin título",
@@ -13,15 +13,16 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         status = "toread",
         cover = placeholderCover,
         rating = 0,
+        review = null,           // { text, isPublic, updatedAt } | null
     } = book;
 
     const [isEditing, setIsEditing] = useState(false);
-    const [form, setForm] = useState({
-        title,
-        author,
-        status,
-        cover,
-    });
+    const [form, setForm] = useState({ title, author, status, cover });
+
+    // reseña
+    const [isReviewOpen, setIsReviewOpen] = useState(false);
+    const hasReview = !!(review && review.text && review.text.trim().length);
+    const [showFull, setShowFull] = useState(false);
 
     const onSave = () => {
         const t = form.title.trim(), a = form.author.trim();
@@ -36,9 +37,18 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
     };
 
     const onRate = (val) => {
-        // Guardamos directamente al cambiar la estrella
         onEdit?.(id, { rating: val }, title);
     };
+
+    const saveReview = (newReview) => {
+        onEdit?.(id, { review: newReview }, title);
+        setIsReviewOpen(false);
+        setShowFull(true); // acabas de guardar: muestra completa
+    };
+
+    const reviewText = (review?.text ?? "").trim();
+    const isLong = reviewText.length > 220;
+    const displayText = (!hasReview) ? "" : (showFull || !isLong) ? reviewText : (reviewText.slice(0, 220) + "…");
 
     return (
         <article className="card" data-id={id}>
@@ -59,7 +69,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         <h3>{title}</h3>
                         <p className="author">{author}</p>
 
-                        {/* Rating 10★ (2x5) */}
+                        {/* Rating 10★ */}
                         <StarRating
                             name={`rating-${id}`}
                             value={rating || 0}
@@ -67,6 +77,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                             label={`Puntuación para ${title}`}
                         />
 
+                        {/* Estado */}
                         <button
                             type="button"
                             className="status"
@@ -77,6 +88,57 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         >
                             {statusLabel(status)}
                         </button>
+
+                        {/* Reseña */}
+                        <div className="review-section">
+                            {!hasReview && !isReviewOpen && (
+                                <button className="btn tiny" onClick={() => setIsReviewOpen(true)}>
+                                    Añadir reseña
+                                </button>
+                            )}
+
+                            {hasReview && !isReviewOpen && (
+                                <>
+                                    <div className="review-meta">
+                                        <span className={`badge ${review.isPublic ? 'public' : 'private'}`}>
+                                            {review.isPublic ? "Pública" : "Privada"}
+                                        </span>
+                                        {review.updatedAt ? (
+                                            <time dateTime={new Date(review.updatedAt).toISOString()}>
+                                                · {new Date(review.updatedAt).toLocaleDateString()}
+                                            </time>
+                                        ) : null}
+                                    </div>
+
+                                    <p className="review-text">{displayText || "—"}</p>
+
+                                    <div className="review-controls">
+                                        {isLong && (
+                                            <button
+                                                className="btn-link"
+                                                onClick={() => setShowFull(v => !v)}
+                                                aria-expanded={showFull}
+                                                aria-controls={`review-full-${id}`}
+                                            >
+                                                {showFull ? "Ver menos" : "Ver completa"}
+                                            </button>
+                                        )}
+                                        <button className="btn tiny" onClick={() => setIsReviewOpen(true)}>
+                                            Editar reseña
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            {isReviewOpen && (
+                                <ReviewEditor
+                                    initial={review ?? { text: "", isPublic: false }}
+                                    onSave={saveReview}
+                                    onCancel={() => setIsReviewOpen(false)}
+                                    bookTitle={title}
+                                />
+                            )}
+                        </div>
                     </>
                 ) : (
                     <div className="edit-form">
