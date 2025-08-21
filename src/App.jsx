@@ -30,6 +30,7 @@ const statusOrder = { toread: 0, reading: 1, finished: 2 };
 const STORAGE_KEY = "bibler.books.v1";
 const SETTINGS_KEY = "bibler.settings.v1";
 
+
 /** Semilla */
 function seedBooks() {
   const now = Date.now();
@@ -111,11 +112,14 @@ export default function App() {
     const byText = (a, b, key) => normalize(a[key]).localeCompare(normalize(b[key])) * sign;
     const byStatus = (a, b) => (statusOrder[a.status] - statusOrder[b.status]) * sign;
     const byAdded = (a, b) => ((a.addedAt ?? 0) - (b.addedAt ?? 0)) * sign;
+    const byRating = (a, b) => ((a.rating ?? 0) - (b.rating ?? 0)) * sign;
 
     if (field === "title") return [...list].sort((a, b) => byText(a, b, "title"));
     if (field === "author") return [...list].sort((a, b) => byText(a, b, "author"));
     if (field === "status") return [...list].sort(byStatus);
     if (field === "addedAt") return [...list].sort(byAdded);
+    if (field === "rating") return [...list].sort(byRating);
+
     return Array.isArray(list) ? list : [];
   }, [safeBooks, filters, sortValue]);
 

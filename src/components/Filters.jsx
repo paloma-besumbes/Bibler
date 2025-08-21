@@ -42,6 +42,10 @@ export default function Filters({ q, status, sort, onChangeFilters, onChangeSort
                 <option value="author-desc">Autor Z→A</option>
                 <option value="status-asc">Estado (Por leer→Leyendo→Terminado)</option>
                 <option value="status-desc">Estado (Terminado→Leyendo→Por leer)</option>
+                <option value="rating-desc">Rating (alto → bajo)</option>
+                <option value="rating-asc">Rating (bajo → alto)</option>
+
+
             </select>
         </div>
     );
