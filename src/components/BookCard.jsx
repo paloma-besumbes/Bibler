@@ -1,9 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StarRating from "./StarRating.jsx";
 import ReviewEditor from "./ReviewEditor.jsx";
+import AudioRecorder from "./AudioRecorder.jsx";
+import { getAudio, deleteAudio } from "../services/audioStore.js";
 
 const placeholderCover = "https://placehold.co/400x600?text=Sin+portada";
 const statusLabel = (s) => (s === "reading" ? "Leyendo" : s === "finished" ? "Terminado" : "Por leer");
+
+function slug(s = "") {
+    return s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+function extFromType(type = "") {
+    const t = type.toLowerCase();
+    if (t.includes("webm")) return ".webm";
+    if (t.includes("ogg")) return ".ogg";
+    if (t.includes("mp4") || t.includes("m4a") || t.includes("aac")) return ".m4a";
+    if (t.includes("mpeg") || t.includes("mp3")) return ".mp3";
+    if (t.includes("wav")) return ".wav";
+    return ".webm";
+}
 
 export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit }) {
     const {
@@ -13,16 +28,44 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         status = "toread",
         cover = placeholderCover,
         rating = 0,
-        review = null,           // { text, isPublic, updatedAt } | null
+        review = null,                 // texto
+        audioReview = null,            // { audioId, isPublic, durationMs, updatedAt } | null
     } = book;
 
     const [isEditing, setIsEditing] = useState(false);
     const [form, setForm] = useState({ title, author, status, cover });
 
-    // reseña
+    // texto
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const hasReview = !!(review && review.text && review.text.trim().length);
     const [showFull, setShowFull] = useState(false);
+    const reviewText = (review?.text ?? "").trim();
+    const isLong = reviewText.length > 220;
+    const displayText = (!hasReview) ? "" : (showFull || !isLong) ? reviewText : (reviewText.slice(0, 220) + "…");
+
+    // audio
+    const [isAudioOpen, setIsAudioOpen] = useState(false);
+    const hasAudio = !!(audioReview && audioReview.audioId);
+    const [audioURL, setAudioURL] = useState("");
+
+    useEffect(() => {
+        let revoke = null;
+        (async () => {
+            if (hasAudio) {
+                const blob = await getAudio(audioReview.audioId);
+                if (blob) {
+                    const url = URL.createObjectURL(blob);
+                    revoke = url;
+                    setAudioURL(url);
+                } else {
+                    setAudioURL("");
+                }
+            } else {
+                setAudioURL("");
+            }
+        })();
+        return () => { if (revoke) URL.revokeObjectURL(revoke); };
+    }, [hasAudio, audioReview?.audioId]);
 
     const onSave = () => {
         const t = form.title.trim(), a = form.author.trim();
@@ -36,19 +79,52 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         setIsEditing(false);
     };
 
-    const onRate = (val) => {
-        onEdit?.(id, { rating: val }, title);
-    };
+    const onRate = (val) => onEdit?.(id, { rating: val }, title);
 
     const saveReview = (newReview) => {
         onEdit?.(id, { review: newReview }, title);
         setIsReviewOpen(false);
-        setShowFull(true); // acabas de guardar: muestra completa
+        setShowFull(true);
     };
 
-    const reviewText = (review?.text ?? "").trim();
-    const isLong = reviewText.length > 220;
-    const displayText = (!hasReview) ? "" : (showFull || !isLong) ? reviewText : (reviewText.slice(0, 220) + "…");
+    const saveAudio = (meta) => {
+        onEdit?.(id, { audioReview: meta }, title);
+        setIsAudioOpen(false);
+        // refresca el player con el blob recién guardado
+        (async () => {
+            try {
+                const b = await getAudio(meta.audioId);
+                if (b) {
+                    if (audioURL) URL.revokeObjectURL(audioURL);
+                    setAudioURL(URL.createObjectURL(b));
+                }
+            } catch { }
+        })();
+    };
+
+    const removeAudio = async () => {
+        if (!hasAudio) return;
+        const ok = confirm("¿Borrar reseña de audio? Esta acción no se puede deshacer.");
+        if (!ok) return;
+        try { await deleteAudio(audioReview.audioId); } catch { }
+        onEdit?.(id, { audioReview: null }, title);
+    };
+
+    const downloadAudio = async () => {
+        if (!hasAudio) return;
+        const b = await getAudio(audioReview.audioId);
+        if (!b) return alert("No se encuentra el audio en este dispositivo.");
+        const ext = extFromType(b.type);
+        const name = `${slug(title)}-resena${ext}`;
+        const url = URL.createObjectURL(b);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+    };
 
     return (
         <article className="card" data-id={id}>
@@ -69,7 +145,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         <h3>{title}</h3>
                         <p className="author">{author}</p>
 
-                        {/* Rating 10★ */}
+                        {/* Rating */}
                         <StarRating
                             name={`rating-${id}`}
                             value={rating || 0}
@@ -89,7 +165,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                             {statusLabel(status)}
                         </button>
 
-                        {/* Reseña */}
+                        {/* Reseña texto */}
                         <div className="review-section">
                             {!hasReview && !isReviewOpen && (
                                 <button className="btn tiny" onClick={() => setIsReviewOpen(true)}>
@@ -118,7 +194,6 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                                 className="btn-link"
                                                 onClick={() => setShowFull(v => !v)}
                                                 aria-expanded={showFull}
-                                                aria-controls={`review-full-${id}`}
                                             >
                                                 {showFull ? "Ver menos" : "Ver completa"}
                                             </button>
@@ -136,6 +211,57 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                     onSave={saveReview}
                                     onCancel={() => setIsReviewOpen(false)}
                                     bookTitle={title}
+                                />
+                            )}
+                        </div>
+
+                        {/* Reseña audio */}
+                        <div className="review-section">
+                            {!hasAudio && !isAudioOpen && (
+                                <button className="btn tiny" onClick={() => setIsAudioOpen(true)}>
+                                    Grabar / subir reseña (audio)
+                                </button>
+                            )}
+
+                            {hasAudio && !isAudioOpen && (
+                                <>
+                                    <div className="review-meta">
+                                        <span className={`badge ${audioReview.isPublic ? 'public' : 'private'}`}>
+                                            {audioReview.isPublic ? "Pública" : "Privada"}
+                                        </span>
+                                        {audioReview.durationMs ? <span>· {Math.round(audioReview.durationMs / 1000)}s</span> : null}
+                                        {audioReview.updatedAt ? (
+                                            <time dateTime={new Date(audioReview.updatedAt).toISOString()}>
+                                                · {new Date(audioReview.updatedAt).toLocaleDateString()}
+                                            </time>
+                                        ) : null}
+                                    </div>
+
+                                    {audioURL ? (
+                                        <audio controls src={audioURL} className="audio-player" aria-label={`Reseña de audio de ${title}`} />
+                                    ) : (
+                                        <p className="review-text">No se pudo cargar el audio en este dispositivo.</p>
+                                    )}
+
+                                    <div className="review-controls" style={{ gap: 8, flexWrap: "wrap" }}>
+                                        <button className="btn tiny" onClick={downloadAudio}>Descargar audio</button>
+                                        <button className="btn tiny" onClick={() => setIsAudioOpen(true)}>Editar reseña (audio)</button>
+                                        <button className="btn tiny danger" onClick={removeAudio}>Borrar audio</button>
+                                    </div>
+                                </>
+                            )}
+
+                            {isAudioOpen && (
+                                <AudioRecorder
+                                    initial={{
+                                        isPublic: audioReview?.isPublic ?? false,
+                                        audioId: audioReview?.audioId,
+                                        durationMs: audioReview?.durationMs ?? 0,
+                                    }}
+                                    bookId={id}
+                                    bookTitle={title}
+                                    onSave={saveAudio}
+                                    onCancel={() => setIsAudioOpen(false)}
                                 />
                             )}
                         </div>

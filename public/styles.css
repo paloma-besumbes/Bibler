@@ -671,3 +671,36 @@ input::placeholder {
   color: var(--muted);
   font-size: .9rem;
 }
+
+/* ===== Audio recorder / player ===== */
+.audio-recorder {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  color: var(--muted);
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.btn.danger {
+  border-color: #ef4444;
+}
+
+.btn.warning {
+  border-color: #eab308;
+}
