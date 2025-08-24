@@ -1,0 +1,102 @@
+{
+    "app": {
+        "title": "Bibler",
+        "slogan": "Your reading diary"
+    },
+    "nav": {
+        "home": "Home",
+        "about": "About"
+    },
+    "filters": {
+        "searchLabel": "Search by title or author",
+        "statusLabel": "Filter by status",
+        "sortLabel": "Sort",
+        "status": {
+            "all": "All",
+            "toread": "To read",
+            "reading": "Reading",
+            "finished": "Finished"
+        },
+        "sort": {
+            "addedAt-desc": "Added (new → old)",
+            "addedAt-asc": "Added (old → new)",
+            "title-asc": "Title A→Z",
+            "title-desc": "Title Z→A",
+            "author-asc": "Author A→Z",
+            "author-desc": "Author Z→A",
+            "status-asc": "Status (To read→Reading→Finished)",
+            "status-desc": "Status (Finished→Reading→To read)",
+            "rating-asc": "Rating (low → high)",
+            "rating-desc": "Rating (high → low)"
+        }
+    },
+    "addForm": {
+        "title": "Add book",
+        "fields": {
+            "title": "Title",
+            "author": "Author",
+            "status": "Status",
+            "cover": "Cover (optional URL)"
+        },
+        "placeholder": {
+            "title": "e.g. 1984",
+            "author": "e.g. George Orwell",
+            "cover": "https://..."
+        },
+        "submit": "Add",
+        "comboboxHint": "{{count}} suggestions. Use arrows + Enter."
+    },
+    "book": {
+        "status": {
+            "toread": "To read",
+            "reading": "Reading",
+            "finished": "Finished"
+        },
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Delete \"{{title}}\"?",
+        "save": "Save",
+        "cancel": "Cancel",
+        "saved": "Saved: {{title}}"
+    },
+    "rating": {
+        "label": "Rating for {{title}}",
+        "value": "{{value}}/10",
+        "none": "—"
+    },
+    "reviewText": {
+        "section": "Review",
+        "add": "Add review",
+        "edit": "Edit review",
+        "public": "Public",
+        "private": "Private",
+        "seeMore": "See more",
+        "seeLess": "See less",
+        "placeholder": "What did you think about the book…",
+        "help": "You can publish it so others can read it, or keep it private."
+    },
+    "reviewAudio": {
+        "section": "Audio review",
+        "record": "Record",
+        "pause": "Pause",
+        "resume": "Resume",
+        "stop": "Stop",
+        "reRecord": "Re-record",
+        "upload": "Upload file",
+        "save": "Save audio",
+        "cancel": "Cancel",
+        "download": "Download audio",
+        "delete": "Delete audio",
+        "deleteConfirm": "Delete audio review? This cannot be undone.",
+        "notSupported": "Your browser doesn't support direct recording. You can upload a file.",
+        "playerAlt": "Audio review of {{title}}",
+        "previewAlt": "Preview of audio review of {{title}}"
+    },
+    "lang": {
+        "label": "Language",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français"
+    }
+}

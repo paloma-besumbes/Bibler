@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import StarRating from "./StarRating.jsx";
 import ReviewEditor from "./ReviewEditor.jsx";
 import AudioRecorder from "./AudioRecorder.jsx";
 import { getAudio, deleteAudio } from "../services/audioStore.js";
 
 const placeholderCover = "https://placehold.co/400x600?text=Sin+portada";
-const statusLabel = (s) => (s === "reading" ? "Leyendo" : s === "finished" ? "Terminado" : "Por leer");
-
-function slug(s = "") {
-    return s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
 function extFromType(type = "") {
     const t = type.toLowerCase();
     if (t.includes("webm")) return ".webm";
@@ -19,8 +15,12 @@ function extFromType(type = "") {
     if (t.includes("wav")) return ".wav";
     return ".webm";
 }
+function slug(s = "") {
+    return s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit }) {
+    const { t } = useTranslation();
     const {
         id = 0,
         title = "Sin título",
@@ -28,14 +28,16 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         status = "toread",
         cover = placeholderCover,
         rating = 0,
-        review = null,                 // texto
-        audioReview = null,            // { audioId, isPublic, durationMs, updatedAt } | null
+        review = null,
+        audioReview = null,
     } = book;
+
+    const statusLabel = (s) => t(`book.status.${s}`);
 
     const [isEditing, setIsEditing] = useState(false);
     const [form, setForm] = useState({ title, author, status, cover });
 
-    // texto
+    // reseña texto
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const hasReview = !!(review && review.text && review.text.trim().length);
     const [showFull, setShowFull] = useState(false);
@@ -68,11 +70,11 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
     }, [hasAudio, audioReview?.audioId]);
 
     const onSave = () => {
-        const t = form.title.trim(), a = form.author.trim();
-        if (!t || !a) return;
+        const tTitle = form.title.trim(), tAuthor = form.author.trim();
+        if (!tTitle || !tAuthor) return;
         onEdit?.(id, {
-            title: t,
-            author: a,
+            title: tTitle,
+            author: tAuthor,
             status: form.status,
             cover: form.cover.trim() || placeholderCover
         }, title);
@@ -90,7 +92,6 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
     const saveAudio = (meta) => {
         onEdit?.(id, { audioReview: meta }, title);
         setIsAudioOpen(false);
-        // refresca el player con el blob recién guardado
         (async () => {
             try {
                 const b = await getAudio(meta.audioId);
@@ -104,7 +105,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
 
     const removeAudio = async () => {
         if (!hasAudio) return;
-        const ok = confirm("¿Borrar reseña de audio? Esta acción no se puede deshacer.");
+        const ok = confirm(t("reviewAudio.deleteConfirm"));
         if (!ok) return;
         try { await deleteAudio(audioReview.audioId); } catch { }
         onEdit?.(id, { audioReview: null }, title);
@@ -118,11 +119,8 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
         const name = `${slug(title)}-resena${ext}`;
         const url = URL.createObjectURL(b);
         const a = document.createElement("a");
-        a.href = url;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 2000);
     };
 
@@ -145,21 +143,19 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         <h3>{title}</h3>
                         <p className="author">{author}</p>
 
-                        {/* Rating */}
                         <StarRating
                             name={`rating-${id}`}
                             value={rating || 0}
                             onChange={onRate}
-                            label={`Puntuación para ${title}`}
+                            label={t("rating.label", { title })}
                         />
 
-                        {/* Estado */}
                         <button
                             type="button"
                             className="status"
                             data-id={id}
                             data-status={status}
-                            aria-label={`Estado: ${statusLabel(status)}. Pulsa para cambiar.`}
+                            aria-label={`${t("book.status." + status)}. ${t("book.save")}`}
                             onClick={() => onCycleStatus?.(id, status, title)}
                         >
                             {statusLabel(status)}
@@ -169,7 +165,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         <div className="review-section">
                             {!hasReview && !isReviewOpen && (
                                 <button className="btn tiny" onClick={() => setIsReviewOpen(true)}>
-                                    Añadir reseña
+                                    {t("reviewText.add")}
                                 </button>
                             )}
 
@@ -177,7 +173,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                 <>
                                     <div className="review-meta">
                                         <span className={`badge ${review.isPublic ? 'public' : 'private'}`}>
-                                            {review.isPublic ? "Pública" : "Privada"}
+                                            {review.isPublic ? t("reviewText.public") : t("reviewText.private")}
                                         </span>
                                         {review.updatedAt ? (
                                             <time dateTime={new Date(review.updatedAt).toISOString()}>
@@ -195,11 +191,11 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                                 onClick={() => setShowFull(v => !v)}
                                                 aria-expanded={showFull}
                                             >
-                                                {showFull ? "Ver menos" : "Ver completa"}
+                                                {showFull ? t("reviewText.seeLess") : t("reviewText.seeMore")}
                                             </button>
                                         )}
                                         <button className="btn tiny" onClick={() => setIsReviewOpen(true)}>
-                                            Editar reseña
+                                            {t("reviewText.edit")}
                                         </button>
                                     </div>
                                 </>
@@ -219,7 +215,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                         <div className="review-section">
                             {!hasAudio && !isAudioOpen && (
                                 <button className="btn tiny" onClick={() => setIsAudioOpen(true)}>
-                                    Grabar / subir reseña (audio)
+                                    {t("reviewAudio.section")} — {t("reviewAudio.upload")}/{t("reviewAudio.record")}
                                 </button>
                             )}
 
@@ -227,7 +223,7 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                 <>
                                     <div className="review-meta">
                                         <span className={`badge ${audioReview.isPublic ? 'public' : 'private'}`}>
-                                            {audioReview.isPublic ? "Pública" : "Privada"}
+                                            {audioReview.isPublic ? t("reviewText.public") : t("reviewText.private")}
                                         </span>
                                         {audioReview.durationMs ? <span>· {Math.round(audioReview.durationMs / 1000)}s</span> : null}
                                         {audioReview.updatedAt ? (
@@ -238,15 +234,17 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                     </div>
 
                                     {audioURL ? (
-                                        <audio controls src={audioURL} className="audio-player" aria-label={`Reseña de audio de ${title}`} />
+                                        <audio controls src={audioURL} className="audio-player" aria-label={t("reviewAudio.playerAlt", { title })} />
                                     ) : (
-                                        <p className="review-text">No se pudo cargar el audio en este dispositivo.</p>
+                                        <p className="review-text">—</p>
                                     )}
 
                                     <div className="review-controls" style={{ gap: 8, flexWrap: "wrap" }}>
-                                        <button className="btn tiny" onClick={downloadAudio}>Descargar audio</button>
-                                        <button className="btn tiny" onClick={() => setIsAudioOpen(true)}>Editar reseña (audio)</button>
-                                        <button className="btn tiny danger" onClick={removeAudio}>Borrar audio</button>
+                                        <button className="btn tiny" onClick={downloadAudio}>{t("reviewAudio.download")}</button>
+                                        <button className="btn tiny" onClick={() => setIsAudioOpen(true)}>
+                                            {t("reviewText.edit")} ({t("reviewAudio.section")})
+                                        </button>
+                                        <button className="btn tiny danger" onClick={removeAudio}>{t("reviewAudio.delete")}</button>
                                     </div>
                                 </>
                             )}
@@ -288,9 +286,9 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
                                 value={form.status}
                                 onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}
                             >
-                                <option value="toread">Por leer</option>
-                                <option value="reading">Leyendo</option>
-                                <option value="finished">Terminado</option>
+                                <option value="toread">{t("book.status.toread")}</option>
+                                <option value="reading">{t("book.status.reading")}</option>
+                                <option value="finished">{t("book.status.finished")}</option>
                             </select>
                         </label>
                         <label>
@@ -308,19 +306,19 @@ export default function BookCard({ book = {}, onDelete, onCycleStatus, onEdit })
             <div className="actions">
                 {!isEditing ? (
                     <>
-                        <button className="btn-edit" onClick={() => setIsEditing(true)}>Editar</button>
+                        <button className="btn-edit" onClick={() => setIsEditing(true)}>{t("book.edit")}</button>
                         <button
                             className="btn-delete"
                             onClick={() => onDelete?.(id, title)}
-                            aria-label={`Eliminar ${title}`}
+                            aria-label={`${t("book.delete")} ${title}`}
                         >
-                            Eliminar
+                            {t("book.delete")}
                         </button>
                     </>
                 ) : (
                     <div className="edit-actions" style={{ display: "flex", gap: 8 }}>
-                        <button className="btn secondary" onClick={() => setIsEditing(false)}>Cancelar</button>
-                        <button className="btn" onClick={onSave}>Guardar</button>
+                        <button className="btn secondary" onClick={() => setIsEditing(false)}>{t("book.cancel")}</button>
+                        <button className="btn" onClick={onSave}>{t("book.save")}</button>
                     </div>
                 )}
             </div>

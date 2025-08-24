@@ -1,0 +1,102 @@
+{
+    "app": {
+        "title": "Bibler",
+        "slogan": "Ton journal de lecture"
+    },
+    "nav": {
+        "home": "Accueil",
+        "about": "À propos"
+    },
+    "filters": {
+        "searchLabel": "Rechercher par titre ou auteur",
+        "statusLabel": "Filtrer par statut",
+        "sortLabel": "Trier",
+        "status": {
+            "all": "Tous",
+            "toread": "À lire",
+            "reading": "En cours",
+            "finished": "Terminé"
+        },
+        "sort": {
+            "addedAt-desc": "Ajouté (récent → ancien)",
+            "addedAt-asc": "Ajouté (ancien → récent)",
+            "title-asc": "Titre A→Z",
+            "title-desc": "Titre Z→A",
+            "author-asc": "Auteur A→Z",
+            "author-desc": "Auteur Z→A",
+            "status-asc": "Statut (À lire→En cours→Terminé)",
+            "status-desc": "Statut (Terminé→En cours→À lire)",
+            "rating-asc": "Note (faible → forte)",
+            "rating-desc": "Note (forte → faible)"
+        }
+    },
+    "addForm": {
+        "title": "Ajouter un livre",
+        "fields": {
+            "title": "Titre",
+            "author": "Auteur",
+            "status": "Statut",
+            "cover": "Couverture (URL optionnelle)"
+        },
+        "placeholder": {
+            "title": "Ex : 1984",
+            "author": "Ex : George Orwell",
+            "cover": "https://..."
+        },
+        "submit": "Ajouter",
+        "comboboxHint": "{{count}} suggestions. Flèches + Entrée."
+    },
+    "book": {
+        "status": {
+            "toread": "À lire",
+            "reading": "En cours",
+            "finished": "Terminé"
+        },
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleteConfirm": "Supprimer « {{title}} » ?",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "saved": "Enregistré : {{title}}"
+    },
+    "rating": {
+        "label": "Note pour {{title}}",
+        "value": "{{value}}/10",
+        "none": "—"
+    },
+    "reviewText": {
+        "section": "Critique",
+        "add": "Ajouter une critique",
+        "edit": "Modifier la critique",
+        "public": "Publique",
+        "private": "Privée",
+        "seeMore": "Voir plus",
+        "seeLess": "Voir moins",
+        "placeholder": "Qu'as-tu pensé du livre…",
+        "help": "Tu peux la publier ou la garder privée."
+    },
+    "reviewAudio": {
+        "section": "Critique audio",
+        "record": "Enregistrer",
+        "pause": "Pause",
+        "resume": "Reprendre",
+        "stop": "Arrêter",
+        "reRecord": "Réenregistrer",
+        "upload": "Téléverser un fichier",
+        "save": "Enregistrer l'audio",
+        "cancel": "Annuler",
+        "download": "Télécharger l'audio",
+        "delete": "Supprimer l'audio",
+        "deleteConfirm": "Supprimer la critique audio ? Action irréversible.",
+        "notSupported": "Ton navigateur ne supporte pas l'enregistrement direct. Tu peux téléverser un fichier.",
+        "playerAlt": "Critique audio de {{title}}",
+        "previewAlt": "Aperçu de la critique audio de {{title}}"
+    },
+    "lang": {
+        "label": "Langue",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français"
+    }
+}

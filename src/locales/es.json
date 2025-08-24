@@ -1,0 +1,102 @@
+{
+    "app": {
+        "title": "Bibler",
+        "slogan": "Tu diario de lecturas"
+    },
+    "nav": {
+        "home": "Inicio",
+        "about": "Acerca de"
+    },
+    "filters": {
+        "searchLabel": "Buscar por título o autor",
+        "statusLabel": "Filtrar por estado",
+        "sortLabel": "Ordenar",
+        "status": {
+            "all": "Todos",
+            "toread": "Por leer",
+            "reading": "Leyendo",
+            "finished": "Terminado"
+        },
+        "sort": {
+            "addedAt-desc": "Añadido (reciente → antiguo)",
+            "addedAt-asc": "Añadido (antiguo → reciente)",
+            "title-asc": "Título A→Z",
+            "title-desc": "Título Z→A",
+            "author-asc": "Autor A→Z",
+            "author-desc": "Autor Z→A",
+            "status-asc": "Estado (Por leer→Leyendo→Terminado)",
+            "status-desc": "Estado (Terminado→Leyendo→Por leer)",
+            "rating-asc": "Rating (bajo → alto)",
+            "rating-desc": "Rating (alto → bajo)"
+        }
+    },
+    "addForm": {
+        "title": "Añadir libro",
+        "fields": {
+            "title": "Título",
+            "author": "Autor",
+            "status": "Estado",
+            "cover": "Portada (URL opcional)"
+        },
+        "placeholder": {
+            "title": "Ej: 1984",
+            "author": "Ej: George Orwell",
+            "cover": "https://..."
+        },
+        "submit": "Añadir",
+        "comboboxHint": "{{count}} sugerencias disponibles. Usa flechas y Enter."
+    },
+    "book": {
+        "status": {
+            "toread": "Por leer",
+            "reading": "Leyendo",
+            "finished": "Terminado"
+        },
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "deleteConfirm": "¿Eliminar \"{{title}}\"?",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "saved": "Guardado: {{title}}"
+    },
+    "rating": {
+        "label": "Puntuación para {{title}}",
+        "value": "{{value}}/10",
+        "none": "—"
+    },
+    "reviewText": {
+        "section": "Reseña",
+        "add": "Añadir reseña",
+        "edit": "Editar reseña",
+        "public": "Pública",
+        "private": "Privada",
+        "seeMore": "Ver completa",
+        "seeLess": "Ver menos",
+        "placeholder": "Qué te ha parecido el libro…",
+        "help": "Puedes publicarla para que otros la lean, o dejarla privada como diario de lectura."
+    },
+    "reviewAudio": {
+        "section": "Reseña de audio",
+        "record": "Grabar",
+        "pause": "Pausar",
+        "resume": "Reanudar",
+        "stop": "Parar",
+        "reRecord": "Regrabar",
+        "upload": "Subir archivo",
+        "save": "Guardar audio",
+        "cancel": "Cancelar",
+        "download": "Descargar audio",
+        "delete": "Borrar audio",
+        "deleteConfirm": "¿Borrar reseña de audio? Esta acción no se puede deshacer.",
+        "notSupported": "Tu navegador no soporta la grabación directa. Puedes subir un archivo.",
+        "playerAlt": "Reseña de audio de {{title}}",
+        "previewAlt": "Previsualización de reseña de {{title}}"
+    },
+    "lang": {
+        "label": "Idioma",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français"
+    }
+}

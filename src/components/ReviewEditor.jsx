@@ -1,17 +1,18 @@
 import { useEffect, useId, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ReviewEditor({
     initial = { text: "", isPublic: false },
-    maxLength = 25000,
+    maxLength = 2000,
     onSave,
     onCancel,
     bookTitle = "libro"
 }) {
+    const { t } = useTranslation();
     const uid = useId();
     const [text, setText] = useState(initial?.text ?? "");
     const [isPublic, setIsPublic] = useState(!!initial?.isPublic);
 
-    // si cambia la reseña inicial (p.ej. al cambiar de tarjeta), sincroniza
     useEffect(() => {
         setText(initial?.text ?? "");
         setIsPublic(!!initial?.isPublic);
@@ -33,21 +34,23 @@ export default function ReviewEditor({
 
     return (
         <form className="review-editor" onSubmit={handleSubmit} aria-labelledby={`${uid}-title`}>
-            <h4 id={`${uid}-title`} className="review-title">Reseña</h4>
+            <h4 id={`${uid}-title`} className="review-title">{t("reviewText.section")}</h4>
 
-            <label htmlFor={`${uid}-textarea`} className="sr-only">Escribe tu reseña para {bookTitle}</label>
+            <label htmlFor={`${uid}-textarea`} className="sr-only">
+                {t("reviewText.section")} — {bookTitle}
+            </label>
             <textarea
                 id={`${uid}-textarea`}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={6}
-                maxLength={maxLength * 2}  // permitimos escribir de más para mostrar "te pasaste"
+                maxLength={maxLength * 2}
                 aria-describedby={`${uid}-help ${uid}-count`}
-                placeholder="Qué te ha parecido el libro…"
+                placeholder={t("reviewText.placeholder")}
             />
 
             <div id={`${uid}-help`} className="review-help">
-                Puedes publicarla para que otros la lean, o dejarla privada como diario de lectura.
+                {t("reviewText.help")}
             </div>
 
             <div className="review-toolbar">
@@ -56,19 +59,21 @@ export default function ReviewEditor({
                         type="checkbox"
                         checked={isPublic}
                         onChange={(e) => setIsPublic(e.target.checked)}
-                        aria-label={`Hacer reseña ${isPublic ? 'privada' : 'pública'}`}
+                        aria-label={isPublic ? t("reviewText.public") : t("reviewText.private")}
                     />
                     <span className="slider" aria-hidden="true"></span>
-                    <span className="switch-label">{isPublic ? "Pública" : "Privada"}</span>
+                    <span className="switch-label">
+                        {isPublic ? t("reviewText.public") : t("reviewText.private")}
+                    </span>
                 </label>
 
                 <div id={`${uid}-count`} className={`char-count${tooLong ? ' error' : ''}`}>
-                    {tooLong ? `Te has pasado por ${Math.abs(remaining)} caracteres` : `${remaining} caracteres restantes`}
+                    {tooLong ? `${Math.abs(remaining)}` : `${remaining}`} {/* contador simple */}
                 </div>
 
                 <div className="review-actions">
-                    <button type="button" className="btn secondary" onClick={onCancel}>Cancelar</button>
-                    <button type="submit" className="btn" disabled={!canSave}>Guardar</button>
+                    <button type="button" className="btn secondary" onClick={onCancel}>{t("book.cancel")}</button>
+                    <button type="submit" className="btn" disabled={!canSave}>{t("book.save")}</button>
                 </div>
             </div>
         </form>

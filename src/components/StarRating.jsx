@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function StarSVG({ active }) {
     return (
@@ -13,29 +14,20 @@ function StarSVG({ active }) {
     );
 }
 
-/**
- * StarRating (0..10)
- * Props:
- *  - name: string (grupo de radios, debe ser único por tarjeta)
- *  - value: number (0..10)
- *  - onChange: fn(newValue:number)
- *  - label: string opcional ("Tu puntuación")
- */
-export default function StarRating({ name, value = 0, onChange, label = "Puntuación" }) {
+/** StarRating (0..10) */
+export default function StarRating({ name, value = 0, onChange, label }) {
+    const { t } = useTranslation();
     const uid = useId();
-    const [hover, setHover] = useState(0); // 0 = sin hover; 1..10 = estrella “previsualizada”
-    const display = hover || value;        // lo que se pinta visualmente
+    const [hover, setHover] = useState(0);
+    const display = hover || value;
+
+    const aria = label ?? t("rating.label", { title: "" });
 
     return (
         <div className="rating-block">
-            <div
-                className="rating"
-                role="radiogroup"
-                aria-label={`${label}, ${value ? `${value} de 10` : "sin puntuación"}`}
-            >
+            <div className="rating" role="radiogroup" aria-label={aria}>
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                     <div className="star-wrap" key={n}>
-                        {/* Radio accesible (oculto visualmente pero enfocable) */}
                         <input
                             className="sr-only star-input"
                             type="radio"
@@ -44,26 +36,23 @@ export default function StarRating({ name, value = 0, onChange, label = "Puntuac
                             value={n}
                             checked={value === n}
                             onChange={() => onChange?.(n)}
-                            onFocus={(e) => setHover(0)} // el foco no debe activar hover
+                            onFocus={() => setHover(0)}
                         />
-                        {/* Label clicable / hoverable */}
                         <label
                             className="star"
                             htmlFor={`${uid}-${name}-${n}`}
                             data-active={display >= n}
                             onMouseEnter={() => setHover(n)}
                             onMouseLeave={() => setHover(0)}
-                            title={`${n} de 10`}
+                            title={`${n} / 10`}
                         >
                             <StarSVG active={display >= n} />
                         </label>
                     </div>
                 ))}
             </div>
-
-            {/* Valor numérico visible y anunciado (a11y) */}
             <span className="rating-value" aria-live="polite" aria-atomic="true">
-                {value ? `${value}/10` : "—"}
+                {value ? t("rating.value", { value }) : t("rating.none")}
             </span>
         </div>
     );
